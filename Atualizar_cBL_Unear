@@ -72,7 +72,7 @@ End Function
 ' CONSULTOR        : TECNUN - Adelson Rosendo Marques da Silva (adelson@tecnun.com.br)
 ' DESCRIÇÃO        : Acessa e direciona para download dos arquivos
 '---------------------------------------------------------------------------------------
-Function DownloadArquivosDeCampanhas()
+Function DownloadArquivosDeCampanhas(strCampanhaSelecionada As String)
     'Tratamento de Erro
     '---------------------------------------------------------------------------------------
 1   On Error GoTo BaixarArquivosRetorno_Error
@@ -92,7 +92,7 @@ Function DownloadArquivosDeCampanhas()
     
     'Se tiver na tela de campanhas,
     If cUnear.CRM_TelaIndex = 2 Then
-        Call ProcessarAcaoMenuCampanha("downloadResponse", 0)
+        Call ProcessarAcaoMenuCampanha("downloadResponse", strCampanha)
     Else
         'Se ja tive o ID campaignDownloadList, indica que a tela de download ja esta ativa
         If IEApp.ControlExists("campaignDownloadList") Then
@@ -115,15 +115,21 @@ Function DownloadArquivosDeCampanhas()
         If Tabela.tBodies.item(0).Rows(i).Cells(2).innertext = "Retorno" Then
             strDataSolic = Tabela.tBodies.item(0).Rows(i).Cells(0).innertext
             strCampanha = Tabela.tBodies.item(0).Rows(i).Cells(3).innertext
-            If Tabela.tBodies.item(0).Rows(i).Cells(4).Children.Length > 0 Then
-                strLinkDownload = Tabela.tBodies.item(0).Rows(i).Cells(4).Children(0).href
-            Else
-                strLinkDownload = "#Arquivo Nao disponivel para download ainda"
+            
+            If strCampanha = strCampanhaSelecionada Then
+            
+                If Tabela.tBodies.item(0).Rows(i).Cells(4).Children.Length > 0 Then
+                    strLinkDownload = Tabela.tBodies.item(0).Rows(i).Cells(4).Children(0).href
+                Else
+                    strLinkDownload = "#Arquivo Nao disponivel para download ainda"
+                End If
+                qtdRegistro = Tabela.tBodies.item(0).Rows(i).Cells(6).innertext
+                Debug.Print "Solicitando o download de : Campanha : " & strCampanha & " : Arquivo > " & strLinkDownload
+                'Efetua o downloa e salva na tabela de log de downloads
+                Call BaixarArquivoDeRetorno(strCampanha, strDataSolic, strLinkDownload, qtdRegistro)
+            
             End If
-            qtdRegistro = Tabela.tBodies.item(0).Rows(i).Cells(6).innertext
-            Debug.Print "Solicitando o download de : Campanha : " & strCampanha & " : Arquivo > " & strLinkDownload
-            'Efetua o downloa e salva na tabela de log de downloads
-            Call BaixarArquivoDeRetorno(strCampanha, strDataSolic, strLinkDownload, qtdRegistro)
+            
         End If
     Next i
 
