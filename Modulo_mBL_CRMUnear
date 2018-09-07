@@ -1,0 +1,42 @@
+Atualizar os seguintes modulos :
+
+Modulo : mBL_CRMUnear()
+
+Função : BaixarArquivosRetorno()
+
+Codigo
+####################################################################################################################################
+Sub BaixarArquivosRetorno()
+    'Tratamento de Erro
+    '---------------------------------------------------------------------------------------
+1   On Error GoTo BaixarArquivosRetorno_Error
+    Dim lngErrorNumber As Long, strErrorMessagem As String:
+    Const cstr_ProcedureName As String = "cBL_Unear.BaixarArquivosRetorno()"
+    '---------------------------------------------------------------------------------------
+    Dim rsListaDisparo As Object
+    
+    Dim cUnear As New cBL_Unear
+    
+    'Acessa o site e garante que a lista de campanhas esteja selecionada
+    Call cUnear.AcessarSite
+    Call cUnear.Entrar(Unear_Usuario(), Unear_Senha())
+    'If Not cUnear.CRM_TelaIndex = 2 Then cUnear.AcessarListaDeCampanhas
+        
+    'Invoca a função de download dos arquivos
+    Call cUnear.DownloadArquivosDeCampanhas
+    
+    showMessage "Download comcluído !", , Fim, , , , Icone_Sucesso
+Fim:
+9   On Error GoTo 0
+10  Exit Sub
+
+BaixarArquivosRetorno_Error:
+11  If Err <> 0 Then
+12      lngErrorNumber = VBA.Err.Number: strErrorMessagem = VBA.Err.Description
+13      Call VBA.Err.Raise(VBA.Err.Number, cstr_ProcedureName, VBA.vbNewLine & cstr_ProcedureName & " Em" & VBA.IIf(VBA.Erl() <> 0, " > Linha (" & VBA.Erl() & ")", "") & " > " & VBA.Err.Description)
+14  End If
+    GoTo Fim:
+    'Debug Mode
+15  Resume
+End Sub
+####################################################################################################################################
